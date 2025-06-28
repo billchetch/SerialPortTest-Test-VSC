@@ -15,7 +15,12 @@ class Program
         {
             //return "COM1"; //windows
             //return "/dev/tty.Bluetooth-Incoming-Port";
-            return "/dev/cu.Bluetooth-Incoming-Port";
+            return "/dev/rfcomm0";
+        }
+
+        protected override bool PortExists()
+        {
+            return File.Exists(PortName);
         }
     }
 
@@ -26,7 +31,7 @@ class Program
         //String portName = "/dev/ttyACM0"; //raspberry pi
         try
         {
-            BTSerialConnection btsp = new BTSerialConnection(115200, System.IO.Ports.Parity.None, 8, StopBits.One);
+            BTSerialConnection btsp = new BTSerialConnection(9600, System.IO.Ports.Parity.None, 8, StopBits.One);
             btsp.Connected += (sender, connected) =>
             {
                 Console.WriteLine("Serial port connected {0}", connected);
@@ -47,6 +52,7 @@ class Program
                 btsp.SendData(data);
                 ConsoleHelper.PK("Press to send again");
             }
+
         }
         catch (Exception e)
         {
