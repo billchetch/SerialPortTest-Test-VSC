@@ -4,6 +4,36 @@ using Chetch.Utilities;
 
 namespace SerialPortTest;
 
+
+/***
+INSTRUCTIOS FOR USE (OS dependent)
+
+LINUX (29/06/2025)
+Process I used to setup Raspberry Pi 5:
+1. Ensure that the remote device is paired and trusted:
+
+> bluetoothctl
+pair REMOTE MAC ADDRESSS
+trust REMOTE MAC ADDRESSS
+
+2. Add Serial Port capability to the bluetooth service by addding the following to /etc/systemd/system/dbus-org.bluez.service
+
+ExecStart=/usr/libexec/bluetooth/bluetoothd -C
+ExecStartPost=/usr/bin/sdptool add SP
+
+3. Do the usual things to restart the service (daemon-reload etc.) or just reboot
+4. Do the necesssary steps to ensure that a device node /dev/rfcomm0 appears when a remote bluetooth device connects
+5. use "sudo rfcomm watch /dev/rfcomm0" or "sudo rfcomm watch hci0" to watch for connections (alternatively automate this with a service file e.g. rfcomm.service and start watching with that)
+6. Now /dev/rfcomm0 can be used as your device path value for constructing a BluetoothSerialConnecton object.
+
+
+MAC OS
+
+WINDOWS
+Todo
+
+***/
+
 public class BluetoothSerialConnection : SerialPortConnection
 {
     #region Fields
@@ -14,6 +44,9 @@ public class BluetoothSerialConnection : SerialPortConnection
     public BluetoothSerialConnection(String devicePath, int baudRate = 9600, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
         : base(baudRate, parity, dataBits, stopBits)
     {
+
+        //check here if the rfcomm process is running to watch what we are doing
+
         this.devicePath = devicePath;
     }
     #endregion
@@ -62,7 +95,7 @@ public class BluetoothSerialConnection : SerialPortConnection
                 }
                 else
                 {
-                    String connected = "channel 1 connected";
+                    String connected = "connected";
                     return result.Contains(connected);
                 }
             }
