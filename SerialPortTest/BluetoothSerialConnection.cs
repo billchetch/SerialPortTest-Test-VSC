@@ -36,6 +36,9 @@ Todo
 
 public class BluetoothSerialConnection : SerialPortConnection
 {
+    #region Constants
+    #endregion
+
     #region Fields
     String devicePath; //dev path or description (Windows)
     #endregion
@@ -45,7 +48,28 @@ public class BluetoothSerialConnection : SerialPortConnection
         : base(baudRate, parity, dataBits, stopBits)
     {
 
-        //check here if the rfcomm process is running to watch what we are doing
+        if (OperatingSystem.IsLinux())
+        {
+            //check here if the rfcomm process is running to watch what we are doing
+            var processes = System.Diagnostics.Process.GetProcesses();
+            String[] searchFor = new string[] { "rfcomm watch " + devicePath, "rfcomm watch hci0" };
+            bool procFound = false;
+            foreach (var proc in processes)
+            {
+                foreach (var name in searchFor)
+                {
+                    if (proc.ProcessName.Contains(name))
+                    {
+                        procFound = true;
+                        break;
+                    }
+                }
+            }
+            if (!procFound)
+            {
+                throw new Exception("Cannot use BluetoothSerial as no connections will be detected as rfcomm watch is not running");
+            }
+        }
 
         this.devicePath = devicePath;
     }
