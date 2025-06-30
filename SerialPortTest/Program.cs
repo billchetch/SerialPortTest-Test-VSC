@@ -8,13 +8,15 @@ class Program
 
     static void Main(string[] args)
     {
-        String devicePath = "/dev/rfcomm0";
-        BluetoothSerialConnection btsc = new BluetoothSerialConnection(devicePath);
-            
+
         //String portName = "/dev/cu.usbmodem1401"; //apple
         //String portName = "/dev/ttyACM0"; //raspberry pi
+        String devicePath = "/dev/rfcomm0";
+        BluetoothSerialConnection? btsc = null;
         try
         {
+            btsc = new BluetoothSerialConnection(devicePath);
+
             btsc.Connected += (sender, connected) =>
             {
                 Console.WriteLine("Serial port connected {0}", connected);
@@ -47,6 +49,5 @@ class Program
                 btsc.Disconnect();
             }
         }
-        
-    }
+    }   
 }

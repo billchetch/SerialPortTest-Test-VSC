@@ -51,14 +51,19 @@ public class BluetoothSerialConnection : SerialPortConnection
         if (OperatingSystem.IsLinux())
         {
             //check here if the rfcomm process is running to watch what we are doing
-            var processes = System.Diagnostics.Process.GetProcesses();
+            var result = CMD.Exec("bash", "-c \"ps aux | grep rfcomm\"", Environment.NewLine);
+            if (String.IsNullOrEmpty(result))
+            {
+                throw new Exception("Cannot use BluetoothSerial as no connections will be detected since rfcomm watch is not running");
+            }
+            String[] processes = result.Split(Environment.NewLine);
             String[] searchFor = new string[] { "rfcomm watch " + devicePath, "rfcomm watch hci0" };
             bool procFound = false;
             foreach (var proc in processes)
             {
                 foreach (var name in searchFor)
                 {
-                    if (proc.ProcessName.Contains(name))
+                    if (proc.Contains(name))
                     {
                         procFound = true;
                         break;
@@ -67,7 +72,7 @@ public class BluetoothSerialConnection : SerialPortConnection
             }
             if (!procFound)
             {
-                throw new Exception("Cannot use BluetoothSerial as no connections will be detected as rfcomm watch is not running");
+                throw new Exception("Cannot use BluetoothSerial as no connections will be detected since rfcomm watch is not running");
             }
         }
 
