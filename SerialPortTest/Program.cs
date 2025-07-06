@@ -11,7 +11,9 @@ class Program
 
         //String portName = "/dev/cu.usbmodem1401"; //apple
         //String portName = "/dev/ttyACM0"; //raspberry pi
-        String devicePath = "/dev/rfcomm0";
+        //String devicePath = "/dev/rfcomm0";
+        String devicePath = "/dev/cu.Bluetooth-Incoming-Port";
+
         BluetoothSerialConnection? btsc = null;
         try
         {
